@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
+
 /*
   Author: Fernando Herrera
   website: fernando-herrera.com
@@ -2325,7 +2327,9 @@ class _DanceState extends State<Dance> with SingleTickerProviderStateMixin {
         builder: (BuildContext context, Widget child) {
           final animation = (step1.value != -0.2)
               ? step1.value
-              : (step2.value != 0.2) ? step2.value : step3.value;
+              : (step2.value != 0.2)
+                  ? step2.value
+                  : step3.value;
 
           return Transform(
               alignment: FractionalOffset.center,
@@ -2414,6 +2418,172 @@ class _RouletteState extends State<Roulette>
             child: widget.child,
           );
         });
+  }
+}
+
+// ============= ShakeX
+
+class ShakeX extends StatefulWidget {
+  final Key key;
+  final Widget child;
+  final Duration duration;
+  final Duration delay;
+  final bool infinite;
+  final Function(AnimationController) controller;
+  final bool manualTrigger;
+  final bool animate;
+  final double shakes;
+  final double distance;
+
+  ShakeX(
+      {this.key,
+      this.child,
+      this.duration = const Duration(milliseconds: 1500),
+      this.delay = const Duration(milliseconds: 0),
+      this.infinite = false,
+      this.controller,
+      this.manualTrigger = false,
+      this.animate = true,
+      this.shakes = 4,
+      this.distance = 10})
+      : super(key: key) {
+    if (manualTrigger == true && controller == null) {
+      throw FlutterError('If you want to use manualTrigger:true, \n\n'
+          'Then you must provide the controller property, that is a callback like:\n\n'
+          ' ( controller: AnimationController) => yourController = controller \n\n');
+    }
+  }
+
+  @override
+  _ShakeXState createState() => _ShakeXState();
+}
+
+class _ShakeXState extends State<ShakeX> with SingleTickerProviderStateMixin {
+  AnimationController controller;
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    controller = AnimationController(duration: widget.duration, vsync: this);
+
+    if (!widget.manualTrigger && widget.animate) {
+      Future.delayed(widget.delay, () {
+        (widget.infinite) ? controller.repeat() : controller?.forward();
+      });
+    }
+
+    if (widget.controller is Function) {
+      widget.controller(controller);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.animate && widget.delay.inMilliseconds == 0) {
+      controller?.forward();
+    }
+
+    final Animation<double> animation =
+        Tween<double>(begin: 0, end: widget.shakes * pi * 2)
+            .chain(CurveTween(curve: Curves.easeInOut))
+            .animate(controller);
+    return AnimatedBuilder(
+        animation: animation,
+        child: widget.child,
+        builder: (BuildContext context, Widget child) => Transform.translate(
+              offset: Offset(widget.distance * -sin(animation.value), 0),
+              child: child,
+            ));
+  }
+}
+
+// ============= ShakeY
+
+class ShakeY extends StatefulWidget {
+  final Key key;
+  final Widget child;
+  final Duration duration;
+  final Duration delay;
+  final bool infinite;
+  final Function(AnimationController) controller;
+  final bool manualTrigger;
+  final bool animate;
+  final double shakes;
+  final double distance;
+
+  ShakeY(
+      {this.key,
+      this.child,
+      this.duration = const Duration(milliseconds: 1500),
+      this.delay = const Duration(milliseconds: 0),
+      this.infinite = false,
+      this.controller,
+      this.manualTrigger = false,
+      this.animate = true,
+      this.shakes = 4,
+      this.distance = 10})
+      : super(key: key) {
+    if (manualTrigger == true && controller == null) {
+      throw FlutterError('If you want to use manualTrigger:true, \n\n'
+          'Then you must provide the controller property, that is a callback like:\n\n'
+          ' ( controller: AnimationController) => yourController = controller \n\n');
+    }
+  }
+
+  @override
+  _ShakeYState createState() => _ShakeYState();
+}
+
+class _ShakeYState extends State<ShakeY> with SingleTickerProviderStateMixin {
+  AnimationController controller;
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    controller = AnimationController(duration: widget.duration, vsync: this);
+
+    if (!widget.manualTrigger && widget.animate) {
+      Future.delayed(widget.delay, () {
+        (widget.infinite) ? controller.repeat() : controller?.forward();
+      });
+    }
+
+    if (widget.controller is Function) {
+      widget.controller(controller);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.animate && widget.delay.inMilliseconds == 0) {
+      controller?.forward();
+    }
+
+    final Animation<double> animation =
+        Tween<double>(begin: 0, end: widget.shakes * pi * 2)
+            .chain(CurveTween(curve: Curves.easeInOut))
+            .animate(controller);
+    return AnimatedBuilder(
+        animation: animation,
+        child: widget.child,
+        builder: (BuildContext context, Widget child) => Transform.translate(
+              offset: Offset(0, widget.distance * -sin(animation.value)),
+              child: child,
+            ));
   }
 }
 

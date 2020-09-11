@@ -86,6 +86,8 @@ All of the following animations could be infinite with a property called ```infi
 - SpinPerfect
 - Dance
 - Roulette
+- ShakeX
+- ShakeY
 
 ## Example
 
